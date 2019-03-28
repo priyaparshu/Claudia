@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "pizza-parlor-executor",
+    "name": "pizza-parlor",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "jzuw5t3jfb",
+    "module": "api"
+  }
+}
