@@ -48,3 +48,30 @@ claudia create \
   -d '{"pizzaId":1,"address":"221B Baker Street"}' \    
   <url>/orders    
     
+for persistance, we will be using dynamodb. We first define a table name; in your case, it will be pizza-orders. Then you need to define attributes. DynamoDB requires only primary key definition. 
+    orderId - primary key ; 
+    type string. 
+    
+aws dynamodb create-table --table-name pizza-orders \    
+  --attribute-definitions AttributeName=orderId,AttributeType=S \     
+  --key-schema AttributeName=orderId,KeyType=HASH \    
+  --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \     
+  --region eu-central-1 \   
+  --query TableDescription.TableArn --output text    
+  
+  this will create the table and return an ARN.
+  
+  Connecting '/order' api with dynamodb table:
+      we first import AWS SDK and then initialize dynamodb documentClient. The createOrder function sends the order data to dynamodb table and receives a confirmation that order is saved successfully. After confimation, handler passes the success value to Claudia API builder which in turn transfer it to the user via Api gateway.
+      
+DocumentClient.put method puts a new item in the database, either by creating a new one or replacing an existing item with the same ID.
+
+test:
+aws dynamodb scan \    
+  --table-name pizza-orders \   
+  --region us-east-1 \
+  --output json   
+  
+curl -i \
+  -H "Content-Type: application/json" \
+  <url>/orders
